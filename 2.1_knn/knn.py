@@ -21,9 +21,10 @@ class KNN:
         return preds
 
     def __compute_distance_matrix(self, input_x):
-        dist_matrix = np.zeros(input_x.shape[0], self.X.shape[0])
+        dist_matrix = np.zeros((input_x.shape[0], self.X.shape[0]))
         dist_matrix = ((dist_matrix.T) + np.sum(input_x ** 2, axis=1)).T
         dist_matrix = dist_matrix + np.sum(self.X ** 2, axis=1)
         dist_matrix = dist_matrix - 2 * (input_x @ self.X.T)
+        return dist_matrix
 
 
