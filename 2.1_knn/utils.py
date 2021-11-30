@@ -5,7 +5,7 @@ import random as rnd
 def read_data(data_path, target_column):
     df = pd.read_csv(data_path)
     X = df.loc[:, df.columns != target_column]
-    Y = df['target']
+    Y = df[target_column]
     return X.values, Y.values
 
 def shuffle(X, Y):
