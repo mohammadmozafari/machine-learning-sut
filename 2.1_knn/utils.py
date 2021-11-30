@@ -35,6 +35,15 @@ def compute_confusion_matrix(targets, preds):
     FN = np.sum(targets * (1-preds))
     return TP, FP, TN, FN
 
+def report_classification(targets, preds):
+    accuracy = compute_accuracy(targets, preds)
+    TP, FP, TN, FN = compute_confusion_matrix(targets, preds)
+    precision = TP/(TP + FP)
+    recall = TP/(TP + FN)
+    specificity = TN/(TN + FP)
+    f1 = (2 * precision * recall) / (precision + recall)
+    return accuracy, precision, recall, specificity, f1
+
 if __name__ == "__main__":
     
     X, Y = read_data('./data/heart.csv', 'target')
