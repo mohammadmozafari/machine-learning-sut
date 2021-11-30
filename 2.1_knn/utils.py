@@ -21,7 +21,7 @@ def split_data(X, Y, split_fraction):
     num_train = int(num_total * split_fraction)
     X_train, Y_train = X[:num_train, :], Y[:num_train]
     X_val, Y_val = X[num_train:, :], Y[num_train:]
-    return X_train.shape, Y_train.shape, X_val.shape, Y_val.shape
+    return X_train, Y_train, X_val, Y_val
 
 def compute_accuracy(targets, preds):
     num_data = targets.shape[0]
