@@ -30,6 +30,35 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    # dimensions
+    N = X.shape[0]
+    C = W.shape[1]
+
+    # compute scores and substract maximum class score for normalization
+    s = X @ W              # (N, C)
+    s = s - (np.max(s, axis=1).reshape(N, 1))
+    s = np.math.e ** s
+
+    for i in range(N):
+        partial_loss = 0.0
+        summation = 0.0
+        for j in range(C):
+            summation += s[i, j]
+        partial_loss = - np.log(s[i, y[i]] / summation)
+        loss += partial_loss
+
+        for j in range(C):
+            partial_gradient = (X[i] * s[i, j]) / summation         # (D, )
+            if j == y[i]:
+                partial_gradient -= X[i]
+            dW[:, j] += partial_gradient
+
+    loss /= N
+    loss += reg * np.sum(W * W)
+
+    dW /= N
+    dW += 2 * reg * W
+
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     return loss, dW
@@ -51,6 +80,26 @@ def softmax_loss_vectorized(W, X, y, reg):
     # regularization!                                                           #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+    # dimensions
+    N = X.shape[0]
+    C = W.shape[1]
+
+    # compute scores and substract maximum class score for normalization
+    s = X @ W              # (N, C)
+    s = s - (np.max(s, axis=1).reshape(N, 1))
+    s = np.math.e ** s
+
+    # compute loss
+    summation = np.sum(s, axis=1)       # (N, )
+    right_class_scores = s[range(N), y]
+    loss = (np.sum(np.log(summation) - np.log(right_class_scores))) / \
+        N + reg * np.sum(W * W)
+
+    # compute gradient
+    s = (s.T / summation).T
+    s[range(N), y] -= 1
+    dW = (X.T @ s) / N + 2 * reg * W
     
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

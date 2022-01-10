@@ -14,7 +14,8 @@ class SVM:
         # TODO: Initialize the weights of svm using random normal distribution with    #
         # standard deviation equals to std.                                            #
         ################################################################################
-        
+        self.cache = {}
+        self.W = np.random.randn(self.n_features, self.n_classes) * std
         ################################################################################
         #                                 END OF YOUR CODE                             #
         ################################################################################
@@ -33,6 +34,18 @@ class SVM:
         # You might need some values computed here when you will update the weights.   #
         # save them in self.cache attribute and use them in update_weights method.     #
         ################################################################################
+
+        scores = X @ self.W
+        target_scores = scores[range(X.shape[0]), y]
+        diff = scores.T - target_scores + 1
+        diff[diff < 0] = 0
+        loss += (np.sum(diff) - X.shape[0] * 1) / X.shape[0]
+        loss += reg_coeff * np.sum(self.W ** 2)
+
+        self.cache['diff'] = diff
+        self.cache['X'] = X
+        self.cache['y'] = y
+        self.cache['reg'] = reg_coeff
         
         ################################################################################
         #                                 END OF YOUR CODE                             #
@@ -53,6 +66,20 @@ class SVM:
         # You can use the values saved in cache attribute previously during the        #
         # computation of loss here.                                                    # 
         ################################################################################
+        
+        diff = self.cache['diff']
+        X = self.cache['X']
+        y = self.cache['y']
+        reg = self.cache['reg']
+
+        diff[diff > 0] = 1
+        diff = diff.T
+        diff[range(diff.shape[0]), y] = 0
+        diff[range(diff.shape[0]), y] = -1 * np.sum(diff, axis=1)
+        dW = X.T @ diff
+        dW /= diff.shape[0]
+        dW += 2 * reg * self.W
+        grad_W = dW
 
         ################################################################################
         #                                 END OF YOUR CODE                             #
@@ -70,6 +97,8 @@ class SVM:
         # Hint: You might want to use np.argmax.                                       #
         ################################################################################
 
+        y_pred = np.argmax(X @ self.W, axis=1)
+
         ################################################################################
         #                                 END OF YOUR CODE                             #
         ################################################################################
@@ -80,6 +109,9 @@ class SVM:
         ################################################################################
         # TODO: write a code to compute the accuracy on X where y is ground truth                                       #
         ################################################################################
+
+        y_pred = np.argmax(X @ self.W, axis=1)
+        _acc = np.mean(y == y_pred)
 
         ################################################################################
         #                                 END OF YOUR CODE                             #
@@ -104,6 +136,10 @@ class SVM:
             # Hint: Use np.random.choice to generate indices. Sampling with                #
             # replacement is faster than sampling without replacement.                     #
             ################################################################################
+
+            idx = np.random.choice(X_train.shape[0], batch_size, replace=True)
+            X_batch = X_train[idx, :]
+            y_batch = y_train[idx]
 
             ################################################################################
             #                                 END OF YOUR CODE                             #
